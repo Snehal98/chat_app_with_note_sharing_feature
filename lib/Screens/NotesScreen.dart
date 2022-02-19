@@ -38,10 +38,8 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreenState extends State<NotesScreen> {
-  Map<String, dynamic>? userMap;
+  // Map<String, dynamic>? userMap;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late String title;
-  late String des;
   late bool isshared;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -384,6 +382,32 @@ class _NotesScreenState extends State<NotesScreen> {
                                           snapshot.data!.docs[index].reference
                                               .update({'isshared': true});
                                           // data['isshared'] = true;
+
+                                          //trial starts
+
+                                          print('\n\nUSERMAP DETAILS\n\n');
+                                          print(widget.userMap);
+
+                                          var noteData = {
+                                            'title': data['title'],
+                                            'description':  data['description'],
+                                            'created': DateTime.now(),
+                                            'isshared': true,
+                                          };
+
+                                          CollectionReference ref = FirebaseFirestore.instance
+                                          // await _firestore
+                                              .collection('users')
+                                              // .doc(FirebaseAuth.instance.currentUser!.uid)
+                                              .doc(widget.userMap['uid'])
+                                              .collection('notes');
+
+                                          ref.add(noteData);
+
+                                          //trial ends
+
+
+
                                           Map<String, dynamic> myNote = {
                                             "sendby": _auth.currentUser!.displayName,
                                             "message": "${data['title']}\n\n${data['description']}\n",
@@ -403,10 +427,10 @@ class _NotesScreenState extends State<NotesScreen> {
                                                 widget.chatRoomId,
                                                 widget.time,
                                                 widget.userMap,
-                                                title: data['title'] ?? 'BLANK',
-                                                description:
-                                                data['description'] ??
-                                                    'BLANK',
+                                                // title: data['title'] ?? 'BLANK',
+                                                // description:
+                                                // data['description'] ??
+                                                //     'BLANK',
                                                 isshared: true,
                                               ),
                                             ),

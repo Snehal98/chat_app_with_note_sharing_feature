@@ -18,13 +18,9 @@ class ChatRoom extends StatefulWidget {
   final Map<String, dynamic> userMap;
   final String time;
   final String chatRoomId;
-  // final String myTime;
-  // final Map<String, dynamic> noteMap;
-  String title = 'BLANK';
-  String description = 'BLANK';
   bool isshared;
 
-  ChatRoom(this.chatRoomId, this.time, this.userMap, {required this.title, required this.description, required this.isshared});
+  ChatRoom(this.chatRoomId, this.time, this.userMap, {required this.isshared});
 
   @override
   State<ChatRoom> createState() => _ChatRoomState();
@@ -32,8 +28,6 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   Map<String, dynamic>? userMap;
-  late String title;
-  late String des;
   late bool isshared;
   Map<String, dynamic>? map;
 
@@ -203,6 +197,9 @@ class _ChatRoomState extends State<ChatRoom> {
 
     final size = MediaQuery.of(context).size;
 
+    ScrollController _scrollController = ScrollController();
+
+
 
     return Scaffold(
       appBar: AppBar(
@@ -250,6 +247,7 @@ class _ChatRoomState extends State<ChatRoom> {
         ),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: [
             Container(
@@ -260,7 +258,7 @@ class _ChatRoomState extends State<ChatRoom> {
                     .collection('chatroom')
                     .doc(widget.chatRoomId)
                     .collection('chats')
-                    .orderBy("time", descending: true)
+                    .orderBy("time", descending: false)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -310,7 +308,7 @@ class _ChatRoomState extends State<ChatRoom> {
                         maxLines: null,
                         minLines: null,
                         controller: _message,
-                        autofocus: true,
+                        // autofocus: true,
                         // maxLines: 5,
                         decoration: InputDecoration(
                             // suffixIcon: IconButton(
@@ -472,7 +470,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
 
     DateTime mydateTime = map['time'].toDate();
-    print(map);
+    // print(map);
 
     String formattedTime =
     DateFormat("h:mma").format(mydateTime);

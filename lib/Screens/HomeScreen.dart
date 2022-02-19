@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     await _firestore
         .collection('users')
-        .where("email", isEqualTo: _search.text)
+        .where("name", isEqualTo: _search.text)
         .get()
         .then((value) {
       setState(() {
@@ -212,8 +212,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             roomId,
                                 currentTime,
                             userMap!,
-                            title: '',
-                            description: '',
+                            // title: '',
+                            // description: '',
                             isshared: false,
                             // noteMap: {"Error": "HomeScreenerror"},
                             ),
