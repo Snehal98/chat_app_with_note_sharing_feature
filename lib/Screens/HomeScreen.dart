@@ -6,6 +6,8 @@ import 'ChatRoom.dart';
 import '../Authenticate/Methods.dart';
 import 'package:intl/intl.dart';
 
+import 'allUsersList.dart';
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -17,7 +19,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final TextEditingController _search = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // var allUsers = [];
+  // List<Text> allUsers = [];
+  var allUsers = [];
+  CollectionReference userReference = FirebaseFirestore.instance
+    .collection('users');
+
 // final List<String> users =  ;
 
   @override
@@ -25,6 +31,32 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
     setStatus("Online");
+    getAllUsers();
+  }
+
+  void getAllUsers() {
+    print('\n\n\nUSER REFERENCE');
+    print(userReference);
+    userReference.get().then((value) {
+      print(value.docs[0].data());
+      value.docs.forEach((element) {
+        final currentUser = element.data() as Map<String, dynamic>;
+        print(currentUser);
+        if (currentUser != null) {
+          final userName = currentUser['name'];
+          final userEmail = currentUser['email'];
+          final userWidget = Text('$userName \n\n $userEmail');
+          allUsers.add(currentUser);
+        }
+        // final userName = currentUser?.['name'];
+        // final TextUser = message.data['User'];
+        // final MessageWeiget = Text('$TextMessage From $TextUser');
+        // MessagesWeigets.add(MessageWeiget);
+        // allUsers.add(element.data());
+      });
+      // print('\n\n\nALL USERS');
+      // print(allUsers);
+    });
   }
 
   void setStatus(String status) async {
@@ -53,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+
   void onSearch() async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -61,6 +94,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     });
 
+    // CollectionReference ref = FirebaseFirestore.instance
+    //   .collection('users');
+    //
+    // for (var i = 0; i < ref.length; i++) {
+    //   allUsers.add(ref.docs[i].data());
+    // }
+
+
+    print("List of all the users");
+    print(userMap);
     await _firestore
         .collection('users')
         .where("name", isEqualTo: _search.text)
@@ -74,10 +117,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
         isLoading = false;
       });
-      print(userMap);
-      // print(allUsers);
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +241,35 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
 
 // this is the correct code
-              userMap != null
+              allUsers != null ?
+                  // ListView.builder(
+                  //   itemCount: allUsers.length,
+                  //     itemBuilder: (context, index) {
+                  //       Container(
+                  //         child: Text(
+                  //           'HELLO'
+                  //         )
+                  //       );
+                  //     })
+              //
+              // Column(
+              //   children: List<Text>.from(allUsers),
+              // )
+              ListView.builder(
+                // Let the ListView know how many items it needs to build.
+                itemCount: allUsers.length,
+                // Provide a builder function. This is where the magic happens.
+                // Convert each item into a widget based on the type of item it is.
+                itemBuilder: (context, index) {
+                  final item = allUsers[index];
+
+                  return ListTile(
+                    title: item['name'],
+                    subtitle: item['email'],
+                  );
+                },
+              )
+              : userMap != null
                       ? ListTile(
                           onTap: () {
                           String roomId = chatRoomId(
@@ -272,6 +342,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 //   ),
                 // ),
                 //trial ends here
+                //starts here
+                // ElevatedButton(
+                //   onPressed: AllUsers(
+                //       widget.chatRoomId,
+                //       widget.time,
+                //       widget.userMap
+                //   ),
+                //   // child: Text("Search"),
+                //   // style: ElevatedButton.styleFrom(
+                //   // primary: Colors.redAccent,
+                //   child: Text(
+                //     "List of users",
+                // ),)
+
+
+                //ends here
+
               ],
             ),
       floatingActionButton: FloatingActionButton(

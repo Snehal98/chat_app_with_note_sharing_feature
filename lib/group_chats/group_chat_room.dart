@@ -47,6 +47,7 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.redAccent,
         title: Text(widget.groupName),
         actions: [
           IconButton(
@@ -178,7 +179,7 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Colors.blue,
+                color: Colors.redAccent,
               ),
               child: Column(
                 children: [

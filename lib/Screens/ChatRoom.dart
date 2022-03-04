@@ -3,10 +3,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:chat_app_va/Authenticate/Methods.dart';
 import 'package:chat_app_va/Screens/SharedNotesScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
@@ -194,7 +196,7 @@ class _ChatRoomState extends State<ChatRoom> {
     final size = MediaQuery.of(context).size;
 
 
-    ScrollController _scrollController = ScrollController(initialScrollOffset: 6000);
+    ScrollController _scrollController = ScrollController(initialScrollOffset: 7000);
     // void _scrollToBottom() {
     //   if (_scrollController.hasClients) {
     //     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
@@ -221,20 +223,33 @@ class _ChatRoomState extends State<ChatRoom> {
       return false;
     }
 
+
     return Scaffold(
 
-      floatingActionButton: isBottom() ?
-      FloatingActionButton(
-          backgroundColor: Colors.grey,
-          splashColor: Colors.redAccent,
-          tooltip: 'Scroll to Bottom',
-          child: Icon(Icons.arrow_downward),
-          onPressed: () =>
-          {
-            isBottom(),
-            _scrollController.jumpTo(_scrollController.position.maxScrollExtent)
-          }) :
-      null,
+      // floatingActionButton: isBottom()
+      //     ? FloatingActionButton(
+      //     backgroundColor: Colors.grey,
+      //     splashColor: Colors.redAccent,
+      //     tooltip: 'Scroll to Bottom',
+      //     child: Icon(Icons.arrow_downward),
+      //     onPressed: () =>
+      //     {
+      //       isBottom(),
+      //       _scrollController.jumpTo(_scrollController.position.maxScrollExtent)
+      //     }) :
+      // null,
+
+        // floatingActionButton: FloatingActionButton(
+        //   backgroundColor: Colors.grey,
+        //   splashColor: Colors.redAccent,
+        //   tooltip: 'Scroll to Bottom',
+        //   child: Icon(Icons.arrow_downward),
+        //   onPressed: () =>
+        //   {
+        //     isBottom(),
+        //     _scrollController.jumpTo(_scrollController.position.maxScrollExtent)
+        //   }) ,
+
 
 
         floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
@@ -274,6 +289,10 @@ class _ChatRoomState extends State<ChatRoom> {
                           ],
                         ),
                       ),
+                      SizedBox(
+                        width: size.width / 2.5,
+                      ),
+                      IconButton(icon: Icon(Icons.logout), onPressed: () => logOut(context))
                     ],
                   ),
                 );
@@ -313,9 +332,16 @@ class _ChatRoomState extends State<ChatRoom> {
                               controller: _scrollController,
                               itemCount: snapshot.data!.docs.length,
                               itemBuilder: (context, index) {
+
+                                // Map? map = snapshot.data!.docs[index].data() as Map?;
+                                // DateTime mydateTime = data!['created'].toDate();
+
+
                                 Map<String, dynamic> map =
                                     snapshot.data!.docs[index].data()
                                         as Map<String, dynamic>;
+
+
                                 //trial
                                 // DateTime mydateTime = map!['time'].toDate();
                                 // String formattedTime =
@@ -392,85 +418,47 @@ class _ChatRoomState extends State<ChatRoom> {
                               PopupMenuButton(
                                   itemBuilder: (context) => [
                                     PopupMenuItem(
-// child: Text("First"),
+                                      value: 1,
                                       child: Row(
                                         children: [
-                                          IconButton(
-                                              onPressed: () {
-// Navigator.of(context).pop();
-// String roomId = chatRoomId(
-//     _auth.currentUser!.displayName!,
-//     userMap!['name']);
-                                                Navigator.of(context)
-// Navigator.pop(context,false)
-                                                    .push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        NotesScreen(
-                                                            widget.chatRoomId,
-                                                            widget.time,
-                                                            widget.userMap),
-                                                  ),
-                                                )
-                                                    .then((value) {
-                                                  print("Calling Set State !");
-                                                  setState(() {});
-                                                });
-                                              },
-                                              icon: Icon(Icons.notes)),
-
-                                          SizedBox(
-                                            width: size.width / 30,
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(0,0,10,0),
+                                            child: Icon(Icons.notes),
                                           ),
-// Text("Notes"),
-                                          InkWell(
-                                            child: Container(
-                                              child: Text("Notes"),
-                                            ),
-                                            onTap: () {
-// String roomId = chatRoomId(
-//     _auth.currentUser!.displayName!,
-//     userMap!['name']);
-// Navigator.popAndPushNamed(context, "/NotesScreen");
-                                              Navigator.of(context)
-                                                  .push(
-                                                MaterialPageRoute(
-                                                  builder: (context) => NotesScreen(
-                                                      widget.chatRoomId,
-                                                      widget.time,
-                                                      widget.userMap),
-                                                ),
-                                              )
-                                                  .then((value) {
-                                                print("Calling Set State !");
-                                                setState(() {});
-                                              });
-                                            },
-                                          ),
+                                          Text("Notes"),
                                         ],
                                       ),
-                                      value: 1,
                                     ),
                                     PopupMenuItem(
+                                      value: 2,
                                       child: Row(
                                         children: [
-                                          IconButton(
-                                              onPressed: getImage,
-                                              icon: Icon(Icons.photo)),
-                                          SizedBox(
-                                            width: size.width / 30,
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(0,0,10,0),
+                                            child: Icon(Icons.photo),
                                           ),
-                                          InkWell(
-                                            child: Container(
-                                              child: Text("Photos"),
-                                            ),
-                                            onTap: () => getImage(),
-                                          ),
+                                          Text("Photos"),
                                         ],
                                       ),
-                                      value: 2,
                                     ),
-                                  ]),
+                                  ],
+                                      onSelected: (int menu) {
+                                      if (menu == 1) {
+                                        Navigator.of(context)
+                                            .push(
+                                          MaterialPageRoute(
+                                            builder: (context) => NotesScreen(
+                                                widget.chatRoomId,
+                                                widget.time,
+                                                widget.userMap),
+                                          ),
+                                        );
+                                      }
+                                      else if (menu == 2) {
+                                        getImage();
+                                      }
+                                },
+                              ),
 
                               IconButton(
                                 icon: Icon(Icons.send),
@@ -497,14 +485,50 @@ class _ChatRoomState extends State<ChatRoom> {
     // String formattedTime = DateFormat. Hms(). format(now);
     // var time = map['time']?? false;
     // DateTime mydateTime = map['time'].toDate();
+    // trial
 
-    DateTime mydateTime = map['time'].toDate();
+    // isshared = data['isshared'] ?? false;
+    // late Color bg;
+    // if (isshared)
+    //   bg = Colors.grey;
+    // else
+    //   bg = Colors.redAccent;
+
+    String stringtime = map['time'] == null
+        ? DateTime.now().toString()
+        : map['time'].toDate().toString();
+    // stringtime = widget.time.toDate().toString();
+    // DateTime date = DateTime.parse(stringtime);
+    // String clocktime = DateFormat('hh:mm a').format(date);
+
+    // trial
+
+
+    // DateTime mydateTime = map['time'].toDate();
     // print(map);
 
-    String formattedTime = DateFormat("h:mma").format(mydateTime);
+
+    DateTime date = DateTime.parse(stringtime);
+    String formattedTime = DateFormat("h:mma").format(date);
 
     return map['type'] == "text"
-        ? Container(
+        ? GestureDetector(
+      // onLongPress: showMenu(
+      //     context: context,
+      //     position: position,
+      //     items: <PopupMenuEntry>[
+      // PopupMenuItem(
+      // value: 10,
+      //     child: Row(
+      //       children: <Widget>[
+      //         Icon(Icons.delete),
+      //         Text("Delete"),
+      //       ]
+      //     )
+      // )
+      //     ]
+      // ),
+      child: Container(
             width: size.width,
             // height: size.height,
             alignment: map['sendby'] == _auth.currentUser!.displayName
@@ -545,7 +569,92 @@ class _ChatRoomState extends State<ChatRoom> {
               ),
             ),
           )
-        : Container(
+    )
+        : map['type'] == "note" ?
+    Container(
+      width: size.width,
+      // height: size.height,
+      alignment: map['sendby'] == _auth.currentUser!.displayName
+          ? Alignment.centerRight
+          : Alignment.centerLeft,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+        decoration: BoxDecoration(
+            // border: Border.all(),
+          boxShadow: [BoxShadow(
+            color: Colors.grey,
+            offset: const Offset(
+              2.0,
+              2.0,
+            ),
+            blurRadius: 4.0,
+            spreadRadius: 1.0,
+          )],
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.greenAccent,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                        Icons.notes,
+                      color: Colors.redAccent,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                      child: Text(
+                  'NOTE',
+                  style: TextStyle(
+                      letterSpacing: 1.5,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.redAccent,
+                  ),
+                ),
+                    )
+                  ],
+            ),
+              ),
+    // decoration: BoxDecoration(
+    //   border: Border.all(),
+    //     borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+    // ),
+            ),
+
+            Container(
+              child: Text(
+                map['message'],
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Container(
+              child: Text(
+                formattedTime,
+                // widget.time,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.black,
+                ),
+                // textAlign: TextAlign.right,
+              ),
+            ),
+          ],
+        ),
+      ),
+    )
+    : Container(
             height: size.height / 2.5,
             width: size.width,
             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'create_group.dart';
@@ -97,6 +98,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.redAccent,
         title: Text("Add Members"),
       ),
       body: SingleChildScrollView(
@@ -122,61 +124,88 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
             SizedBox(
               height: size.height / 20,
             ),
-            Container(
-              height: size.height / 14,
-              width: size.width,
-              alignment: Alignment.center,
-              child: Container(
-                height: size.height / 14,
-                width: size.width / 1.15,
-                child: TextField(
-                  controller: _search,
-                  decoration: InputDecoration(
-                    hintText: "Search",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: size.height / 30,
+                ),
+                Container(
+                  height: size.height / 14,
+                  width: size.width / 1.4,
+                  alignment: Alignment.center,
+                  child: Container(
+                    height: size.height / 14,
+                    // width: size.width / 1.15,
+                    width: size.width / 1.4,
+                    child: TextField(
+                      controller: _search,
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(
-              height: size.height / 50,
-            ),
-            isLoading
-                ? Container(
-              height: size.height / 12,
-              width: size.height / 12,
-              alignment: Alignment.center,
-              child: CircularProgressIndicator(),
-            )
-                : ElevatedButton(
-              onPressed: onSearch,
-              child: Text("Search"),
+                SizedBox(
+                  height: size.height / 50,
+                ),
+                SizedBox(
+                  width: size.width / 40,
+                ),
+                isLoading
+                    ? Container(
+                        height: size.height / 12,
+                        width: size.height / 12,
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(),
+                      )
+                    : ElevatedButton(
+                        onPressed: onSearch,
+                        // child: Text("Search"),
+                        child: Icon(
+                          Icons.search_sharp,
+                          size: 28.0,
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Colors.redAccent,
+                          ),
+                          padding: MaterialStateProperty.all(
+                            EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                          ),
+                        ),
+                      ),
+              ],
             ),
             userMap != null
                 ? ListTile(
-              onTap: onResultTap,
-              leading: Icon(Icons.account_box),
-              title: Text(userMap!['name']),
-              subtitle: Text(userMap!['email']),
-              trailing: Icon(Icons.add),
-            )
+                    onTap: onResultTap,
+                    leading: Icon(Icons.account_box),
+                    title: Text(userMap!['name']),
+                    subtitle: Text(userMap!['email']),
+                    trailing: Icon(Icons.add),
+                  )
                 : SizedBox(),
           ],
         ),
       ),
       floatingActionButton: membersList.length >= 2
           ? FloatingActionButton(
-        child: Icon(Icons.forward),
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => CreateGroup(
-              membersList: membersList,
-            ),
-          ),
-        ),
-      )
+              child: Icon(Icons.forward),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => CreateGroup(
+                    membersList: membersList,
+                  ),
+                ),
+              ),
+            )
           : SizedBox(),
     );
   }

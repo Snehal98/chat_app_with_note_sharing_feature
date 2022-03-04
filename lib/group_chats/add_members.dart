@@ -36,7 +36,7 @@ class _AddMembersINGroupState extends State<AddMembersINGroup> {
 
     await _firestore
         .collection('users')
-        .where("email", isEqualTo: _search.text)
+        .where("name", isEqualTo: _search.text)
         .get()
         .then((value) {
       setState(() {

@@ -213,6 +213,8 @@ class _NotesScreenState extends State<NotesScreen> {
                             data,
                             formattedTime,
                             snapshot.data!.docs[index].reference,
+                              widget.chatRoomId,
+                              widget.userMap,
                           ),
                         ),
                       )
@@ -411,7 +413,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                           Map<String, dynamic> myNote = {
                                             "sendby": _auth.currentUser!.displayName,
                                             "message": "${data['title']}\n\n${data['description']}\n",
-                                            "type": "text",
+                                            "type": "note",
                                             "time": FieldValue.serverTimestamp(),
                                           };
 
