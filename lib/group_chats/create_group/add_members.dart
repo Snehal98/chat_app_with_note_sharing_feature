@@ -198,6 +198,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
       floatingActionButton: membersList.length >= 2
           ? FloatingActionButton(
               child: Icon(Icons.forward),
+              backgroundColor: Colors.redAccent,
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => CreateGroup(

@@ -15,9 +15,12 @@ class GroupChatHomeScreen extends StatefulWidget {
 class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  Map<String, dynamic>? userMap;
   bool isLoading = true;
 
   List groupList = [];
+
+
 
   @override
   void initState() {
@@ -41,6 +44,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -48,6 +52,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Groups"),
+        backgroundColor: Colors.redAccent,
       ),
       body: isLoading
           ? Container(
@@ -75,6 +80,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.create),
+        backgroundColor: Colors.redAccent,
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => AddMembersInGroup(),

@@ -19,12 +19,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final TextEditingController _search = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // List<Text> allUsers = [];
   var allUsers = [];
   CollectionReference userReference =
       FirebaseFirestore.instance.collection('users');
-
-// final List<String> users =  ;
 
   @override
   void initState() {
@@ -35,17 +32,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void getAllUsers() {
-    print('\n\n\nUSER REFERENCE');
-    print(userReference);
     userReference.get().then((value) {
-      print(value.docs[0].data());
+      // print(value.docs[0].data());
       value.docs.forEach((element) {
         final currentUser = element.data() as Map<String, dynamic>;
         print(currentUser);
         if (currentUser.isNotEmpty) {
           final userName = currentUser['name'];
           final userEmail = currentUser['email'];
-          // final userWidget = Text('$userName \n\n $userEmail');
+
           if (userName != null && userEmail != null) {
             allUsers.add({'name': userName, 'email': userEmail});
           }
@@ -56,8 +51,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         // MessagesWeigets.add(MessageWeiget);
         // allUsers.add(element.data());
       });
-      // print('\n\n\nALL USERS');
-      // print(allUsers);
     });
   }
 
@@ -101,8 +94,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     //   allUsers.add(ref.docs[i].data());
     // }
 
-    print("List of all the users");
-    print(userMap);
     await _firestore
         .collection('users')
         .where("name", isEqualTo: _search.text)
@@ -116,8 +107,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
         isLoading = false;
       });
-    }).onError((error, stackTrace) => null)
-    ;
+      print(userMap);
+    });
+        // .onError((error, stackTrace) => null)
   }
 
   @override
@@ -139,6 +131,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       body: Stack(
         
         children: [
+          Column(
+            children: [
+              SizedBox(
+                height: size.height / 35,
+              ),
                 Row(
                   children: [
                     SizedBox(
@@ -186,6 +183,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   ],
                 ),
+            ],
+          ),
               isLoading  ? Center(
               child: Container(
                 height: size.height / 20,
@@ -193,33 +192,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 child: CircularProgressIndicator(),
               ),
             )
-          : 
-          Stack(
+          : Stack(
             children: [
               Positioned(
                 left: 0,
-                top: 50,
-                child: userMap == null ? SingleChildScrollView(
-                    // padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: size.height / 1.22,
-                              width: size.width,
-                              child: ListView.builder(
-                                itemCount: allUsers.length,
-                                itemBuilder: (context, index) {
-                                  print('\n\n\nALL USERS\n\n\n');
-                                  print(allUsers);
-                                  return allUsersWidget(
-                                      size, allUsers[index], context);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                      : ListTile(
+                top: 80,
+                child: userMap != null ?
+                    Container(
+                        height: size.height / 14,
+                        // width: size.width / 1.4,
+                        width: size.width ,
+                        alignment: Alignment.center,
+                        child: ListTile(
                             onTap: () {
                               String roomId = chatRoomId(
                                   _auth.currentUser!.displayName!,
@@ -254,6 +238,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             trailing:
                                 Icon(Icons.chat, color: Colors.black, size: 35),
                           )
+                    )
+                    :SingleChildScrollView(
+                  // padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: size.height / 1.22,
+                        width: size.width ,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: allUsers.length,
+                          itemBuilder: (context, index) {
+                            return allUsersWidget(
+                                size, allUsers[index], context);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               )],
           )
                   
@@ -274,7 +278,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget allUsersWidget(Size size, Map<String, dynamic> currentUser, BuildContext context) {
     // print('\n\nCurrent User\n\n');
     // print(currentUser);
+    dynamic currentTime = DateFormat.jm().format(DateTime.now());
     return ListTile(
+      onTap: () {
+        String roomId = chatRoomId(
+            _auth.currentUser!.displayName!,
+            userMap!['name']);
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ChatRoom(
+              roomId,
+              currentTime,
+              userMap!,
+              // title: '',
+              // description: '',
+              isshared: false,
+              // noteMap: {"Error": "HomeScreenerror"},
+            ),
+          ),
+        );
+      },
       leading: Icon(Icons.account_box, color: Colors.black, size: 35),
       title: Text(
         currentUser['name'],
