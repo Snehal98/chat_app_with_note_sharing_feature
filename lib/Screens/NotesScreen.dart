@@ -19,19 +19,10 @@ class NotesScreen extends StatefulWidget {
   final String time;
   final String chatRoomId;
 
-  // late final String chatRoomId;
+  final bool isGroupChat;
+  final String groupChatId;
 
-  // NotesScreen(this.chatRoomId);
-  // String roomId = '';
-
-  // NotesScreen(this.roomId);
-  // final Function onSendNote;
-  // NotesScreen(this.onSendNote);
-  // late final Map data;
-
-  // NotesScreen(this.data);
-
-  NotesScreen(this.chatRoomId, this.time, this.userMap);
+  NotesScreen(this.isGroupChat, this.chatRoomId, this.groupChatId, this.time, this.userMap);
 
   @override
   _NotesScreenState createState() => _NotesScreenState();
@@ -46,10 +37,7 @@ class _NotesScreenState extends State<NotesScreen> {
   // final TextEditingController _message = TextEditingController();
 
   // final FirebaseAuth _auth = FirebaseAuth.instance;
-  CollectionReference ref = FirebaseFirestore.instance
-      .collection('users')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .collection('notes');
+  CollectionReference ref = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).collection('notes');
 
   // CollectionReference ref = FirebaseFirestore.instance
   //     .collection('chatroom')
@@ -57,26 +45,10 @@ class _NotesScreenState extends State<NotesScreen> {
   //     .collection('notes');
   //
 
-  List<Color> myColors = [
-    Colors.blue,
-    Colors.amber,
-    Colors.pink,
-    Colors.green,
-    Colors.lightBlueAccent,
-    Colors.lightGreenAccent,
-    Colors.amberAccent,
-    Colors.pinkAccent,
-    Colors.white54,
-    Colors.purpleAccent,
-    Colors.red,
-    Colors.teal,
-    Colors.tealAccent,
-    Colors.cyan
-  ];
+  List<Color> myColors = [Colors.blue, Colors.amber, Colors.pink, Colors.green, Colors.lightBlueAccent, Colors.lightGreenAccent, Colors.amberAccent, Colors.pinkAccent, Colors.white54, Colors.purpleAccent, Colors.red, Colors.teal, Colors.tealAccent, Colors.cyan];
 
   String chatRoomId(String user1, String user2) {
-    if (user1[0].toLowerCase().codeUnits[0] >
-        user2.toLowerCase().codeUnits[0]) {
+    if (user1[0].toLowerCase().codeUnits[0] > user2.toLowerCase().codeUnits[0]) {
       return "$user1$user2";
     } else {
       return "$user2$user1";
@@ -194,8 +166,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 // final String des;
                 // late final Map data;
                 // final String time;
-                String formattedTime =
-                    DateFormat.yMMMd().add_jm().format(mydateTime);
+                String formattedTime = DateFormat.yMMMd().add_jm().format(mydateTime);
                 // String sharednote = _message.text;
                 // String title = 'mytitle';
                 // String description = 'mydes';
@@ -213,8 +184,8 @@ class _NotesScreenState extends State<NotesScreen> {
                             data,
                             formattedTime,
                             snapshot.data!.docs[index].reference,
-                              widget.chatRoomId,
-                              widget.userMap,
+                            widget.chatRoomId,
+                            widget.userMap,
                           ),
                         ),
                       )
@@ -378,75 +349,71 @@ class _NotesScreenState extends State<NotesScreen> {
                                     // ),
                                     child: IconButton(
                                         onPressed: () {
-                                          print('Reference below:\n');
-                                          print(snapshot
-                                              .data!.docs[index].reference);
-                                          snapshot.data!.docs[index].reference
-                                              .update({'isshared': true});
-                                          // data['isshared'] = true;
+                                          if (!widget.isGroupChat) {
+                                            // print('Reference below:\n');
+                                            // print(snapshot.data!.docs[index].reference);
+                                            snapshot.data!.docs[index].reference.update({'isshared': true});
 
-                                          //trial starts
+                                            // print('\n\nUSERMAP DETAILS\n\n');
+                                            // print(widget.userMap);
 
-                                          print('\n\nUSERMAP DETAILS\n\n');
-                                          print(widget.userMap);
+                                            // Adding details of notes and "shared note" in "notes" section of that particular user
+                                            var noteData = {
+                                              'title': data['title'],
+                                              'description': data['description'],
+                                              'created': DateTime.now(),
+                                              'isshared': true,
+                                            };
+                                            CollectionReference ref = FirebaseFirestore.instance.collection('users').doc(widget.userMap['uid']).collection('notes');
+                                            ref.add(noteData);
 
-                                          var noteData = {
-                                            'title': data['title'],
-                                            'description':  data['description'],
-                                            'created': DateTime.now(),
-                                            'isshared': true,
-                                          };
+                                            // Adding note into the "chats section" of those 2 users
+                                            Map<String, dynamic> myNote = {
+                                              "sendby": _auth.currentUser!.displayName,
+                                              "message": "${data['title']}\n\n${data['description']}\n",
+                                              "type": "note",
+                                              "time": FieldValue.serverTimestamp(),
+                                            };
+                                            _firestore.collection('chatroom').doc(widget.chatRoomId).collection('chats').add(myNote);
 
-                                          CollectionReference ref = FirebaseFirestore.instance
-                                          // await _firestore
-                                              .collection('users')
-                                              // .doc(FirebaseAuth.instance.currentUser!.uid)
-                                              .doc(widget.userMap['uid'])
-                                              .collection('notes');
+                                            Navigator.pop(context);
 
-                                          ref.add(noteData);
-
-                                          //trial ends
-
-
-
-                                          Map<String, dynamic> myNote = {
-                                            "sendby": _auth.currentUser!.displayName,
-                                            "message": "${data['title']}\n\n${data['description']}\n",
-                                            "type": "note",
-                                            "time": FieldValue.serverTimestamp(),
-                                          };
-
-                                          _firestore
-                                              .collection('chatroom')
-                                              .doc(widget.chatRoomId)
-                                              .collection('chats')
-                                              .add(myNote);
-
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) => ChatRoom(
-                                                widget.chatRoomId,
-                                                widget.time,
-                                                widget.userMap,
-                                                // title: data['title'] ?? 'BLANK',
-                                                // description:
-                                                // data['description'] ??
-                                                //     'BLANK',
-                                                isshared: true,
-                                              ),
-                                            ),
-                                            // MaterialPageRoute(
-                                            //   builder: (context) => ChatRoom(
-                                            //     // "31",
-                                            //       roomId,
-                                            //       '',
-                                            //       userMap!,
-                                            //       title: data['title'] ?? 'BLANK',
-                                            //       description: data['description'] ?? 'BLANK'
+                                            // Navigator.of(context).push(
+                                            //   MaterialPageRoute(
+                                            //     builder: (context) => ChatRoom(
+                                            //       widget.chatRoomId,
+                                            //       widget.time,
+                                            //       widget.userMap,
+                                            //       isshared: true,
+                                            //     ),
                                             //   ),
-                                            // )
-                                          );
+                                            // );
+                                          } else {
+                                            snapshot.data!.docs[index].reference.update({'isshared': true});
+
+                                            // Adding details of notes and "shared note" in "notes" section of that particular user
+                                            var noteData = {
+                                              'title': data['title'],
+                                              'description': data['description'],
+                                              'created': DateTime.now(),
+                                              'isshared': true,
+                                            };
+                                            CollectionReference ref = FirebaseFirestore.instance.collection('users').doc(widget.userMap['uid']).collection('notes');
+                                            ref.add(noteData);
+
+                                            // Adding note into the "chats section" of those that particular group
+                                            Map<String, dynamic> myNote = {
+                                              "sendby": _auth.currentUser!.displayName,
+                                              "message": "${data['title']}\n\n${data['description']}\n",
+                                              "type": "note",
+                                              "time": FieldValue.serverTimestamp(),
+                                            };
+                                            _firestore.collection('groups').doc(widget.groupChatId).collection('chats').add(myNote);
+                                            print("\n\nmyNote");
+                                            print(myNote);
+                                            print("\n\n");
+                                            Navigator.pop(context);
+                                          }
                                         },
                                         icon: Icon(Icons.arrow_forward_ios)),
                                   ),
