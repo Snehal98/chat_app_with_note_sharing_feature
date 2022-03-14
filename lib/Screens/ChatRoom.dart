@@ -1,6 +1,7 @@
 // import 'dart:convert';
 // import 'dart:convert';
 import 'dart:async';
+// import 'dart:html';
 import 'dart:io';
 
 import 'package:chat_app_va/Authenticate/Methods.dart';
@@ -18,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'NotesScreen.dart';
 import 'addnote.dart';
 
+
 class ChatRoom extends StatefulWidget {
   final Map<String, dynamic> userMap;
   final String time;
@@ -27,10 +29,14 @@ class ChatRoom extends StatefulWidget {
   ChatRoom(this.chatRoomId, this.time, this.userMap, {required this.isshared});
 
   @override
-  State<ChatRoom> createState() => _ChatRoomState();
+  // State<ChatRoom> createState() => _ChatRoomState();
+  State<StatefulWidget> createState() {
+    return new _ChatRoomState();
+  }
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+
   static const double infinity = 1.0 / 0.0;
   Map<String, dynamic>? userMap;
   late bool isshared;
@@ -45,18 +51,34 @@ class _ChatRoomState extends State<ChatRoom> {
 
   File? imageFile;
 
-  // get myTime => null;
 
-  Future getImage() async {
+
+  // Future getImage() async {
+  //   ImagePicker _picker = ImagePicker();
+  //
+  //   await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
+  //     if (xFile != null) {
+  //       imageFile = File(xFile.path);
+  //       uploadImage();
+  //     }
+  //   });
+  // }
+
+  Future getImage(bool isCamera) async {
     ImagePicker _picker = ImagePicker();
-
-    await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
-      if (xFile != null) {
-        imageFile = File(xFile.path);
-        uploadImage();
-      }
-    });
+    // File? imageFile;
+    XFile? imageXFile;
+    if (isCamera) {
+      imageXFile = await _picker.pickImage(source: ImageSource.camera);
+      imageFile = File(imageXFile!.path);
+      uploadImage();
+    } else {
+      imageXFile = await _picker.pickImage(source: ImageSource.gallery);
+      imageFile = File(imageXFile!.path);
+      uploadImage();
+    }
   }
+
 
   Future uploadImage() async {
     String fileName = Uuid().v1();
@@ -152,6 +174,22 @@ class _ChatRoomState extends State<ChatRoom> {
 
   @override
   Widget build(BuildContext context) {
+
+
+    // imageSelectorGallery() async {
+    //   galleryFile = (await ImagePicker.pickImage(
+    //     source: ImageSource.gallery,
+    //   )) as File;
+    //   setState(() {});
+    // }
+
+
+
+
+
+
+
+
     // String roomId = chatRoomId(
     //     _auth.currentUser!.displayName!,
     //     userMap!['name']);
@@ -173,10 +211,11 @@ class _ChatRoomState extends State<ChatRoom> {
 
     final size = MediaQuery.of(context).size;
 
-    ScrollController _scrollController = ScrollController(initialScrollOffset: 7000);
+    ScrollController _scrollController = ScrollController(initialScrollOffset: 50000);
+    // ScrollController _scrollController = ScrollController();
     // void _scrollToBottom() {
     //   if (_scrollController.hasClients) {
-    //     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+    //     _scrollController.animateTo(10 * _scrollController.position.maxScrollExtent,
     //         duration: Duration(milliseconds: 300), curve: Curves.elasticOut);
     //   } else {
     //     Timer(Duration(milliseconds: 400), () => _scrollToBottom());
@@ -397,7 +436,8 @@ class _ChatRoomState extends State<ChatRoom> {
                                 ),
                               );
                             } else if (menu == 2) {
-                              getImage();
+                              getImage(false);
+                              // imageSelectorGallery;
                             }
                           },
                         ),

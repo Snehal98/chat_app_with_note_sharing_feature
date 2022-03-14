@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Map<String, dynamic>? userMap;
+  Map<String, dynamic>? currentUser;
   bool isLoading = false;
   final TextEditingController _search = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -35,21 +36,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     userReference.get().then((value) {
       // print(value.docs[0].data());
       value.docs.forEach((element) {
-        final currentUser = element.data() as Map<String, dynamic>;
-        print(currentUser);
-        if (currentUser.isNotEmpty) {
-          final userName = currentUser['name'];
-          final userEmail = currentUser['email'];
+        final thisUser = element.data() as Map<String, dynamic>;
+        print(thisUser);
+        if (thisUser.isNotEmpty) {
+          final userUid = thisUser['uid'];
+          final userName = thisUser['name'];
+          final userEmail = thisUser['email'];
+          final userStatus = thisUser['status'];
 
           if (userName != null && userEmail != null) {
-            allUsers.add({'name': userName, 'email': userEmail});
+            allUsers.add({'uid': userUid, 'name': userName, 'email': userEmail, 'status': userStatus});
           }
         }
-        // final userName = currentUser?.['name'];
-        // final TextUser = message.data['User'];
-        // final MessageWeiget = Text('$TextMessage From $TextUser');
-        // MessagesWeigets.add(MessageWeiget);
-        // allUsers.add(element.data());
       });
     });
   }
@@ -82,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void onSearch() async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final size = MediaQuery.of(context).size;
 
     setState(() {
       isLoading = true;
@@ -94,22 +93,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     //   allUsers.add(ref.docs[i].data());
     // }
 
-    await _firestore
-        .collection('users')
-        .where("name", isEqualTo: _search.text)
-        .get()
-        .then((value) {
-      setState(() {
-        userMap = value.docs[0].data();
-        // for (var i = 0; i < value.docs.length; i++) {
-        //   allUsers.add(value.docs[i].data());
-        // }
+    // if (_search.text.isNotEmpty) {
+      await _firestore
+          .collection('users')
+          .where("name", isEqualTo: _search.text.toLowerCase())
+          .get()
+          .then((value) {
+        setState(() {
+          userMap = value.docs[0].data();
+          // for (var i = 0; i < value.docs.length; i++) {
+          //   allUsers.add(value.docs[i].data());
+          // }
 
-        isLoading = false;
+          isLoading = false;
+        });
+        _search.clear();
+        print(userMap);
       });
-      print(userMap);
-    });
-        // .onError((error, stackTrace) => null)
   }
 
   @override
@@ -170,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         size: 28.0,
                       ),
                       style: ButtonStyle(
+                        alignment: Alignment.center,
                         backgroundColor: MaterialStateProperty.all(
                           Colors.redAccent,
                         ),
@@ -236,10 +237,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ),
                             subtitle: Text(userMap!['email']),
                             trailing:
-                                Icon(Icons.chat, color: Colors.black, size: 35),
+                                // Icon(Icons.chat, color: Colors.black, size: 35),
+                            IconButton(
+                              icon: Icon(
+                                Icons.chat,
+                              ),
+                              iconSize: 35,
+                              color: Colors.black,
+                              onPressed: () {}
+                              // => onRemoveMembers(index)
+                            ),
                           )
                     )
-                    :SingleChildScrollView(
+                    : SingleChildScrollView(
                   // padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
                   child: Column(
                     children: [
@@ -251,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           itemCount: allUsers.length,
                           itemBuilder: (context, index) {
                             return allUsersWidget(
-                                size, allUsers[index], context);
+                                size, allUsers[index], context, index);
                           },
                         ),
                       ),
@@ -275,7 +285,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-  Widget allUsersWidget(Size size, Map<String, dynamic> currentUser, BuildContext context) {
+  //
+  // void onRemoveMembers(int index) {
+  //   if (allUsers![index]['uid'] != _auth.currentUser!.uid) {
+  //     setState(() {
+  //       allUsers!.remove(index);
+  //     });
+  //   }
+  // }
+
+
+  Widget allUsersWidget(Size size, Map<String, dynamic> currentUser, BuildContext context, int index) {
     // print('\n\nCurrent User\n\n');
     // print(currentUser);
     dynamic currentTime = DateFormat.jm().format(DateTime.now());
@@ -283,14 +303,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       onTap: () {
         String roomId = chatRoomId(
             _auth.currentUser!.displayName!,
-            userMap!['name']);
+            currentUser['name']);
 
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => ChatRoom(
               roomId,
               currentTime,
-              userMap!,
+                currentUser,
               // title: '',
               // description: '',
               isshared: false,
@@ -309,7 +329,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
       ),
       subtitle: Text(currentUser['email']),
-      trailing: Icon(Icons.chat, color: Colors.black, size: 35),
+      trailing: IconButton(
+        icon: Icon(
+          Icons.chat,
+        ),
+        iconSize: 35,
+        color: Colors.black,
+        onPressed: () {}
+        // => onRemoveMembers(index)
+      ),
     );
   }
 }

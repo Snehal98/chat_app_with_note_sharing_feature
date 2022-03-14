@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 class AddNote extends StatefulWidget {
@@ -14,6 +15,8 @@ class AddNote extends StatefulWidget {
 class _AddNoteState extends State<AddNote> {
   late String title;
   late String des;
+  final _formKey = GlobalKey<FormState>();
+
 
 
 
@@ -53,7 +56,24 @@ class _AddNoteState extends State<AddNote> {
                     ),
                     //
                     ElevatedButton(
-                      onPressed: add,
+                      // onPressed: add,
+                      onPressed: () {
+                        add();
+                        if (_formKey.currentState!.validate()) {
+                          setState(() {
+                          });
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Note Created Sucessfully",
+                          );
+                          setState(() {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                          content: Text('Note Unsuccessfull')),
+                          );
+                        });
+                      }
+                        },
                       child: Text(
                         "Save",
                         style: TextStyle(
@@ -82,12 +102,19 @@ class _AddNoteState extends State<AddNote> {
                 ),
                 //
                 Form(
+                  key: _formKey,
                   child: Column(
                     children: [
                       TextFormField(
                         decoration: InputDecoration.collapsed(
                           hintText: "Title",
                         ),
+                        validator: (title) {
+                          // add your custom validation here.
+                          if (title!.isEmpty) {
+                            return 'Title cannot be empty';
+                          }
+                        },
                         style: TextStyle(
                           fontSize: 32.0,
                           fontFamily: "lato",
@@ -106,6 +133,12 @@ class _AddNoteState extends State<AddNote> {
                           decoration: InputDecoration.collapsed(
                             hintText: "Note Description",
                           ),
+                          validator: (des) {
+                            // add your custom validation here.
+                            if (des!.isEmpty) {
+                              return 'Description cannot be empty';
+                            }
+                          },
                           style: TextStyle(
                             fontSize: 20.0,
                             fontFamily: "lato",

@@ -527,7 +527,7 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
         : chatMap['type'] == "img"
             ? Container(
                 width: size.width,
-                alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerLeft : Alignment.centerRight,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -562,7 +562,7 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                     ? Container(
                         width: size.width,
                         // height: size.height,
-                        alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+                        alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerLeft : Alignment.centerRight,
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                           margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
