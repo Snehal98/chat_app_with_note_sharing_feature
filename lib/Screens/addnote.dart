@@ -168,6 +168,7 @@ class _AddNoteState extends State<AddNote> {
       'description': des,
       'created': DateTime.now(),
       'isshared': false,
+      'myself': true,
     };
 
 

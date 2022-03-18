@@ -19,12 +19,14 @@ import 'group_info.dart';
 
 class GroupChatRoom extends StatefulWidget {
   final String groupChatId, groupName;
+
   // final Map<String, dynamic> userMap;
   // final String time;
   // bool isshared;
   // required this.time, required this.userMap, required this.isshared
 
-  GroupChatRoom({required this.groupName, required this.groupChatId, Key? key}) : super(key: key);
+  GroupChatRoom({required this.groupName, required this.groupChatId, Key? key})
+      : super(key: key);
 
   @override
   State<GroupChatRoom> createState() => _GroupChatRoomState();
@@ -58,17 +60,28 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
     String fileName = Uuid().v1();
     int status = 1;
 
-    await _firestore.collection('groups').doc(widget.groupChatId).collection('chats').doc(fileName).set({
+    await _firestore
+        .collection('groups')
+        .doc(widget.groupChatId)
+        .collection('chats')
+        .doc(fileName)
+        .set({
       "sendby": _auth.currentUser!.displayName,
       "message": "",
       "type": "img",
       "time": FieldValue.serverTimestamp(),
     });
 
-    var ref = FirebaseStorage.instance.ref().child('images').child("$fileName.jpg");
+    var ref =
+        FirebaseStorage.instance.ref().child('images').child("$fileName.jpg");
 
     var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
-      await _firestore.collection('groups').doc(widget.groupChatId).collection('chats').doc(fileName).delete();
+      await _firestore
+          .collection('groups')
+          .doc(widget.groupChatId)
+          .collection('chats')
+          .doc(fileName)
+          .delete();
 
       status = 0;
     });
@@ -76,14 +89,20 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
     if (status == 1) {
       String imageUrl = await uploadTask.ref.getDownloadURL();
 
-      await _firestore.collection('groups').doc(widget.groupChatId).collection('chats').doc(fileName).update({"message": imageUrl});
+      await _firestore
+          .collection('groups')
+          .doc(widget.groupChatId)
+          .collection('chats')
+          .doc(fileName)
+          .update({"message": imageUrl});
 
       print(imageUrl);
     }
   }
 
   String chatRoomId(String user1, String user2) {
-    if (user1[0].toLowerCase().codeUnits[0] > user2.toLowerCase().codeUnits[0]) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2.toLowerCase().codeUnits[0]) {
       return "$user1$user2";
     } else {
       return "$user2$user1";
@@ -101,7 +120,11 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
 
       _message.clear();
 
-      await _firestore.collection('groups').doc(widget.groupChatId).collection('chats').add(chatData);
+      await _firestore
+          .collection('groups')
+          .doc(widget.groupChatId)
+          .collection('chats')
+          .add(chatData);
 
       //trial strats
       // await _firestore
@@ -125,6 +148,7 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
       //  trial ends
     }
   }
+
   // Future<void> _getUserName() async {
   //   Firestore.instance
   //       .collection('Users')
@@ -145,21 +169,35 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.redAccent,
-          title: Text(widget.groupName),
-          actions: [
-            IconButton(
-                onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => GroupInfo(
-                          groupName: widget.groupName,
-                          groupId: widget.groupChatId,
+            backgroundColor: Colors.redAccent,
+            title: Row(
+              children: [
+                Container(
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: AssetImage('assets/images/girl.jpg'),
+                  ),
+                ),
+                SizedBox(
+                  width: size.width / 20,
+                ),
+                Container(
+                  width: size.width / 2,
+                  child: Text(widget.groupName),
+                ),
+                // actions: [
+                IconButton(
+                    onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => GroupInfo(
+                              groupName: widget.groupName,
+                              groupId: widget.groupChatId,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                icon: Icon(Icons.more_vert)),
-          ],
-        ),
+                    icon: Icon(Icons.more_vert)),
+              ],
+            )),
         body: Stack(children: [
           SingleChildScrollView(
             child: Column(
@@ -168,13 +206,20 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                   height: size.height / 1.27,
                   width: size.width,
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: _firestore.collection('groups').doc(widget.groupChatId).collection('chats').orderBy('time').snapshots(),
+                    stream: _firestore
+                        .collection('groups')
+                        .doc(widget.groupChatId)
+                        .collection('chats')
+                        .orderBy('time')
+                        .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ListView.builder(
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
-                            Map<String, dynamic> chatMap = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                            Map<String, dynamic> chatMap =
+                                snapshot.data!.docs[index].data()
+                                    as Map<String, dynamic>;
 
                             return messageTile(size, chatMap, context);
                           },
@@ -226,7 +271,8 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
 //   icon: Icon(Icons.photo),
 // ),
                                   hintText: "Type your message here...",
-                                  contentPadding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(20, 0, 0, 0),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -248,7 +294,8 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                                 child: Row(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 0, 10, 0),
                                       child: Icon(Icons.notes),
                                     ),
                                     Text("Notes"),
@@ -260,7 +307,8 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                                 child: Row(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 0, 10, 0),
                                       child: Icon(Icons.photo),
                                     ),
                                     Text("Photos"),
@@ -481,8 +529,11 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
         );
   }
 
-  Widget messageTile(Size size, Map<String, dynamic> chatMap, BuildContext context) {
-    String stringtime = chatMap['time'] == null ? DateTime.now().toString() : chatMap['time'].toDate().toString();
+  Widget messageTile(
+      Size size, Map<String, dynamic> chatMap, BuildContext context) {
+    String stringtime = chatMap['time'] == null
+        ? DateTime.now().toString()
+        : chatMap['time'].toDate().toString();
 
     DateTime date = DateTime.parse(stringtime);
     String formattedTime = DateFormat("h:mma").format(date);
@@ -492,7 +543,9 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
     return chatMap['type'] == "text"
         ? Container(
             width: size.width,
-            alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerRight : Alignment.centerLeft,
+            alignment: chatMap['sendBy'] == _auth.currentUser!.displayName
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
             child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -527,7 +580,9 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
         : chatMap['type'] == "img"
             ? Container(
                 width: size.width,
-                alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerLeft : Alignment.centerRight,
+                alignment: chatMap['sendBy'] == _auth.currentUser!.displayName
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -562,10 +617,15 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                     ? Container(
                         width: size.width,
                         // height: size.height,
-                        alignment: chatMap['sendBy'] == _auth.currentUser!.displayName ? Alignment.centerLeft : Alignment.centerRight,
+                        alignment:
+                            chatMap['sendBy'] == _auth.currentUser!.displayName
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight,
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-                          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 14),
+                          margin:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                           decoration: BoxDecoration(
                             // border: Border.all(),
                             boxShadow: [
@@ -585,9 +645,20 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              // Container(
+                              //   child: Text(
+                              //     chatMap['sendBy'],
+                              //     style: TextStyle(
+                              //       fontSize: 12,
+                              //       fontWeight: FontWeight.w500,
+                              //       color: Colors.white,
+                              //     ),
+                              //   ),
+                              // ),
                               Container(
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(0.0, 0, 0, 10.0),
+                                  padding: const EdgeInsets.fromLTRB(
+                                      0.0, 0, 0, 10.0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
@@ -597,7 +668,8 @@ class _GroupChatRoomState extends State<GroupChatRoom> {
                                         color: Colors.redAccent,
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8.0, 0, 0, 0),
                                         child: Text(
                                           'NOTE',
                                           style: TextStyle(

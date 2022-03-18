@@ -239,7 +239,8 @@ class _ChatRoomState extends State<ChatRoom> {
       return false;
     }
 
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
       // floatingActionButton: isBottom()
       //     ? FloatingActionButton(
       //     backgroundColor: Colors.grey,
@@ -284,6 +285,7 @@ class _ChatRoomState extends State<ChatRoom> {
                       width: size.width / 20,
                     ),
                     Container(
+                      width: size.width / 2,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -298,10 +300,18 @@ class _ChatRoomState extends State<ChatRoom> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      width: size.width / 2.5,
-                    ),
-                    IconButton(icon: Icon(Icons.logout), onPressed: () => logOut(context))
+                        // SizedBox(
+                        //   width: size.width / 4.5,
+                        // ),
+                    Container(
+                      child: IconButton(icon: Icon(Icons.logout), onPressed: () => logOut(context))
+
+                    )
+                    // SizedBox(
+                    //   width: size.width / 5,
+                    // ),
+                    // IconButton(icon: Icon(Icons.logout), onPressed: () => logOut(context))
+
                   ],
                 ),
               );
@@ -456,8 +466,12 @@ class _ChatRoomState extends State<ChatRoom> {
           // second container
         ],
       ),
+        )
     );
   }
+
+
+
 
   Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
     String stringtime = map['time'] == null ? DateTime.now().toString() : map['time'].toDate().toString();

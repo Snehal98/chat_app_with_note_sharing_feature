@@ -32,6 +32,7 @@ class _NotesScreenState extends State<NotesScreen> {
   // Map<String, dynamic>? userMap;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late bool isshared;
+  late bool myself;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // final TextEditingController _message = TextEditingController();
@@ -154,8 +155,9 @@ class _NotesScreenState extends State<NotesScreen> {
                 print('\n\nPrinting reference\n\n');
                 print(myReference);
                 isshared = data['isshared'] ?? false;
+                myself = data['myself'] ?? false;
                 late Color bg;
-                if (isshared)
+                if (isshared == true && myself == false)
                   bg = Colors.grey;
                 else
                   bg = myColors[random.nextInt(6)];
@@ -363,6 +365,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                               'description': data['description'],
                                               'created': DateTime.now(),
                                               'isshared': true,
+                                              'myself': false,
                                             };
                                             CollectionReference ref = FirebaseFirestore.instance.collection('users').doc(widget.userMap['uid']).collection('notes');
                                             ref.add(noteData);
@@ -397,6 +400,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                               'description': data['description'],
                                               'created': DateTime.now(),
                                               'isshared': true,
+                                              'myself': false,
                                             };
                                             CollectionReference ref = FirebaseFirestore.instance.collection('users').doc(widget.userMap['uid']).collection('notes');
                                             ref.add(noteData);
